@@ -5,15 +5,19 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
 import { Box, Button } from '@mui/material';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
-
-export default function LoanCard({ loan , handleOpen  }) {
+export default function LoanCard({ loan, handleOpen }) {
+  const navigate = useNavigate()
+  const handleApply = () => {
+    navigate("/application")
+  }
   return (
     <Card
       sx={{
         backgroundColor: 'white',
         borderRadius: 3,
-        boxShadow: 3,
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -56,10 +60,13 @@ export default function LoanCard({ loan , handleOpen  }) {
           borderRadius: 2,
           textTransform: 'none'
         }}
-        onClick={handleOpen}
+        onClick={() => {
+          const token = Cookies.get("token");
+          return !token ?  handleOpen() :handleApply();
+        }}
       >
         Apply Now
       </Button>
-    </Card>
+    </Card >
   );
 }

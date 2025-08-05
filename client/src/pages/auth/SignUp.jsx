@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Typography,
@@ -7,22 +7,44 @@ import {
     Stack
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
+import { apiEndPoints } from '../../constant/apiEndPoints';
+import axios from "axios"
+import { BASE_URL, toastAlert } from '../../utils';
 export default function SignupPage() {
+    const [loading , setLoading] = useState(false)
+    const navigate = useNavigate()
     const { control, handleSubmit } = useForm({
         defaultValues: {
             name: '',
             email: '',
             cnic: '',
             address: '',
-            contactNbr: ''
+            contactNbr: '',
+            password: ''
         }
     });
 
-    const onSubmit = (data) => {
+    const onSubmit = async(data) => {
         console.log('Signup Data:', data);
-        // API call can be placed here
+        try {
+            setLoading(true)
+            const api = `${BASE_URL}${apiEndPoints.signup}`
+            const response = await axios.post(api , data)
+            console.log("response" , response)
+            toastAlert({
+                type : "success",
+                message : "Sign up Successful"
+            })
+            setLoading(false)
+            navigate("/login")
+        } catch (error) {
+            setLoading(false)
+             toastAlert({
+                type : "error",
+                message : error.message
+            })
+        }
     };
 
     return (
@@ -46,7 +68,7 @@ export default function SignupPage() {
                     boxShadow: 3
                 }}
             >
-                <Typography variant="h5" color="#1B5E20" fontWeight={700} mb={3}>
+                <Typography variant="h5" color="#1B5E20" fontWeight={700} mb={3} textAlign={"center"}>
                     Create Your Account
                 </Typography>
 
@@ -62,6 +84,17 @@ export default function SignupPage() {
                         control={control}
                         rules={{ required: true }}
                         render={({ field }) => <TextField label="Email" type="email" fullWidth {...field} />}
+                    />
+                    <Controller
+                        name="password"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => <TextField label="Password"
+                            fullWidth
+                            {...field}
+                            type='password'
+                        />
+                        }
                     />
                     <Controller
                         name="cnic"
@@ -96,7 +129,7 @@ export default function SignupPage() {
                     </Box>
 
                     <Button type="submit" variant="contained" sx={{ backgroundColor: '#2E7D32' }}>
-                        Sign Up
+                        {loading ? "Signning up..." :"Sign Up"}
                     </Button>
                 </Stack>
             </Box>

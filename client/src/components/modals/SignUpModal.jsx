@@ -10,8 +10,14 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Controller, useForm } from 'react-hook-form';
+import { BASE_URL, toastAlert } from '../../utils';
+import { apiEndPoints } from '../../constant/apiEndPoints';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function SignUpModal({ open, setOpen, handleClose }) {
+  const [loading , setLoading] = React.useState(false)
+  const navigate = useNavigate()
   const { control, handleSubmit } = useForm({
     defaultValues: {
       cnic: '',
@@ -20,9 +26,31 @@ export default function SignUpModal({ open, setOpen, handleClose }) {
     }
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data);
-   
+    try {
+      setLoading(true)
+      const api = `${BASE_URL}${apiEndPoints.signup}`
+      const response = await axios.post(api, data)
+      console.log("response", response)
+      toastAlert({
+        type: "success",
+        message: "Please Check Email Address and Proceed!"
+      })
+      setLoading(false)
+      navigate("/login" ,{
+        state : {
+          path : "signupModal"
+        }
+      })
+    } catch (error) {
+      setLoading(false)
+      toastAlert({
+        type: "error",
+        message: error.message
+      })
+    }
+
   };
 
   return (
@@ -47,7 +75,7 @@ export default function SignUpModal({ open, setOpen, handleClose }) {
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5" fontWeight="bold" color="#1B5E20" >
-            Sign Up
+            Apply Now
           </Typography>
           <IconButton onClick={handleClose}>
             <CloseIcon />
@@ -84,8 +112,10 @@ export default function SignUpModal({ open, setOpen, handleClose }) {
             )}
           />
 
-          <Button type="submit" variant="contained" sx={{ backgroundColor: '#2E7D32' }}>
-            Register
+          <Button type="submit" variant="contained" sx={{ backgroundColor: '#2E7D32' }}
+            disabled ={loading}
+          >
+            {loading ? "Applying..." : "Apply Now"}
           </Button>
         </Stack>
       </Box>

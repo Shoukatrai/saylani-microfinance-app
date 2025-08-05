@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { Link, useNavigate } from 'react-router-dom';
 import { AccountBalance } from '@mui/icons-material';
+import Cookies from "js-cookie"
 const pages = [{
   title: "About",
   url: "/about"
@@ -154,9 +155,12 @@ function Navbar() {
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              {!Cookies.get("token") ? <Button onClick={()=>navigate("/login")} sx={{
+                backgroundColor : "#F0FDF4",
+                color :"#2E7D32"
+              }}>Login</Button> : <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
+              </IconButton>}
             </Tooltip>
             <Menu
               sx={{ mt: '45px' }}

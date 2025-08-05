@@ -13,41 +13,37 @@ import { apiEndPoints } from '../../constant/apiEndPoints';
 import axios from 'axios';
 import Cookies from "js-cookie"
 
-export default function LoginPage() {
-    const [loading , setLoading] = useState(false)
+const PasswordChange = () => {
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
     const location = useLocation()
     const { control, handleSubmit } = useForm({
         defaultValues: {
-            email: '',
-            password: ''
+            oldPassword: '',
+            newPassword: ''
         }
     });
 
     const onSubmit = async (data) => {
         console.log('Login Data:', data);
-        console.log('Location:', location);
+        const email = location.state.email
+
         try {
             setLoading(true)
-            const api = `${BASE_URL}${apiEndPoints.login}`
-            const response = await axios.post(api, data)
+            const api = `${BASE_URL}${apiEndPoints.updatePassword}`
+            const updatePassObj = {
+                ...data,
+                email
+            }
+            console.log("updatePassObj", updatePassObj)
+            const response = await axios.patch(api, updatePassObj)
             console.log("response", response)
             setLoading(false)
-            Cookies.set("token" , response.data.token)
-            const path = location.state.path
             toastAlert({
                 type: "success",
-                message: "log in Successful"
+                message: "Password Updated!"
             })
-            if(path === "signupModal"){
-                navigate("/update-password" ,{
-                    state : {
-                        email : data.email
-                    }
-                })
-            }else{
-                navigate("/")
-            }
+            navigate("/")
         } catch (error) {
             setLoading(false)
             toastAlert({
@@ -56,7 +52,6 @@ export default function LoginPage() {
             })
         }
     };
-
     return (
         <Box
             sx={{
@@ -78,39 +73,36 @@ export default function LoginPage() {
                     boxShadow: 3
                 }}
             >
-                <Typography variant="h5" color="#1B5E20" fontWeight={700} mb={3}>
-                    Login to Your Account
+                <Typography variant="h5" color="#1B5E20" fontWeight={700} mb={3} textAlign={"center"}>
+                    Please Change your Password
                 </Typography>
 
                 <Stack spacing={2} component="form" onSubmit={handleSubmit(onSubmit)}>
                     <Controller
-                        name="email"
+                        name="oldPassword"
                         control={control}
                         rules={{ required: true }}
-                        render={({ field }) => <TextField label="Email" type="email" fullWidth {...field} />}
+                        render={({ field }) => <TextField label="Enter Temp Password" type="password" fullWidth {...field} />}
                     />
                     <Controller
-                        name="password"
+                        name="newPassword"
                         control={control}
                         rules={{ required: true }}
-                        render={({ field }) => <TextField label="Password" type="password" fullWidth {...field} />}
+                        render={({ field }) => <TextField label="Enter New Password" type="password" fullWidth {...field} />}
                     />
-                    <Box textAlign={"center"}>
-                        <Typography fontWeight={300} >
-                            Don't Have an Account? <Link style={{
-                                color: "#2E7D32",
-                                textDecoration: "none",
-                                fontWeight: "500"
-                            }} to={"/create-account"}>Create Account</Link>
-                        </Typography>
-                    </Box>
-                    <Button type="submit" variant="contained" sx={{ backgroundColor: '#2E7D32' }}
-                        disabled = {loading}
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{ backgroundColor: '#2E7D32' }}
+                        disabled={loading}
                     >
-                        {loading ? "Logging in..." : "Login"}
+                        {loading ? "Updating..." : "Change Password"}
                     </Button>
+
                 </Stack>
             </Box>
         </Box>
-    );
+    )
 }
+
+export default PasswordChange
