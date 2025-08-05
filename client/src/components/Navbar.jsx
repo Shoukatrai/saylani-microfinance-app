@@ -28,7 +28,24 @@ const pages = [{
   url: "/application"
 },
 ];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = [
+  {
+    title: 'Profile',
+    url: "/profile"
+  },
+  {
+    title: 'Account',
+    url: '/account'
+  },
+  {
+    title: 'Loan Request',
+    url: '/loan'
+  },
+  {
+    title: 'Logout',
+    url: '/logout'
+  }
+];
 
 function Navbar() {
   const navigate = useNavigate()
@@ -155,9 +172,9 @@ function Navbar() {
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              {!Cookies.get("token") ? <Button onClick={()=>navigate("/login")} sx={{
-                backgroundColor : "#F0FDF4",
-                color :"#2E7D32"
+              {!Cookies.get("token") ? <Button onClick={() => navigate("/login")} sx={{
+                backgroundColor: "#F0FDF4",
+                color: "#2E7D32"
               }}>Login</Button> : <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>}
@@ -180,7 +197,9 @@ function Navbar() {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                  <Link to={setting.url}>
+                    <Typography sx={{ textAlign: 'center' }}>{setting.title}</Typography>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>

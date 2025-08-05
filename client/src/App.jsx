@@ -9,6 +9,9 @@ import SignupPage from './pages/auth/SignUp'
 import LoginPage from './pages/auth/Login'
 import { Bounce, ToastContainer } from 'react-toastify'
 import PasswordChange from './pages/auth/PasswordChange'
+import Profile from './pages/client/profile'
+import Logout from './pages/client/logout'
+import LoanRequestPage from './pages/client/Loan'
 
 function App() {
   <Navbar />
@@ -23,6 +26,10 @@ function App() {
         <Route path='/categories' element={<LoanCategories />} />
         <Route path='/application' element={<ApplyNow />} />
         <Route path='/update-password' element={<PasswordChange />} />
+        <Route path='/profile' element={<Profile />} />
+        <Route path='/account' element={<PasswordChange />} />
+        <Route path='/logout' element={<Logout />} />
+        <Route path='/loan' element={<LoanRequestPage />} />
       </Routes>
       <ToastContainer
         position="top-right"

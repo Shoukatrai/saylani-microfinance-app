@@ -43,7 +43,7 @@ const PasswordChange = () => {
                 type: "success",
                 message: "Password Updated!"
             })
-            navigate("/")
+            navigate("/loan")
         } catch (error) {
             setLoading(false)
             toastAlert({

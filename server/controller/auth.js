@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { userPassUpdateTemplate } from "../templates/userPasswordUpdate.js";
-
+import LoanRequest from "../model/ApplicationRequest.js"
 export const createUser = async (req, res) => {
   try {
     const { email, password, ...rest } = req.body;
@@ -40,17 +40,26 @@ export const createUser = async (req, res) => {
         pass: process.env.APP_PASSWORD,
       },
     });
-
+    console.log("createUser befor if" , createdUser)
     if (!password) {
+      console.log("createdUser" , createdUser)
       const mailOptions = {
         from: process.env.USER_EMAIL,
         to: createdUser.email,
         subject: "USER VERIFICATION",
         html: userPassUpdateTemplate(rawPassword),
       };
+      
+      const loanObj = {
+        ...rest,
+        email,
+        applicantId: createdUser._id
+      }
+      const LoanRequestResponse = await LoanRequest.create(loanObj)
+      console.log("LoanRequestResponse" , LoanRequestResponse)
       const emailResponse = await transporter.sendMail(mailOptions);
-      console.log("emailResponse", emailResponse);
     }
+
     res.status(200).json({
       status: true,
       message: "SignUp Completed!",
