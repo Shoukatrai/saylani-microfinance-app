@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { userPassUpdateTemplate } from "../templates/userPasswordUpdate.js";
-import LoanRequest from "../model/ApplicationRequest.js"
+import LoanRequest from "../model/ApplicationRequest.js";
 export const createUser = async (req, res) => {
   try {
     const { email, password, ...rest } = req.body;
@@ -40,23 +40,23 @@ export const createUser = async (req, res) => {
         pass: process.env.APP_PASSWORD,
       },
     });
-    console.log("createUser befor if" , createdUser)
+    console.log("createUser befor if", createdUser);
     if (!password) {
-      console.log("createdUser" , createdUser)
+      console.log("createdUser", createdUser);
       const mailOptions = {
         from: process.env.USER_EMAIL,
         to: createdUser.email,
         subject: "USER VERIFICATION",
         html: userPassUpdateTemplate(rawPassword),
       };
-      
+
       const loanObj = {
         ...rest,
         email,
-        applicantId: createdUser._id
-      }
-      const LoanRequestResponse = await LoanRequest.create(loanObj)
-      console.log("LoanRequestResponse" , LoanRequestResponse)
+        applicantId: createdUser._id,
+      };
+      const LoanRequestResponse = await LoanRequest.create(loanObj);
+      console.log("LoanRequestResponse", LoanRequestResponse);
       const emailResponse = await transporter.sendMail(mailOptions);
     }
 
@@ -77,9 +77,8 @@ export const createUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
+
     const response = await User.findOne({ email });
-    console.log("response", response);
     if (!response) {
       return res.status(400).json({
         status: false,
@@ -87,27 +86,28 @@ export const loginUser = async (req, res) => {
         data: null,
       });
     }
-    const hashedPassword = response.password;
-    console.log("hashedPassword", hashedPassword);
-    const checkPassword = await bcrypt.compare(password, hashedPassword);
+
+    const checkPassword = await bcrypt.compare(password, response.password);
     if (!checkPassword) {
       return res.status(400).json({
         status: false,
-        message: "password or email is not correct!",
+        message: "Password or email is incorrect!",
         data: null,
       });
     }
 
-    const token = jwt.sign({ id: response._id }, process.env.JWT_PRIVATE_KEY);
-    console.log("token", token);
+    const token = jwt.sign({ id: response._id }, process.env.JWT_PRIVATE_KEY, {
+      expiresIn: "7d",
+    });
 
-    res.status(200).json({
+    
+
+    return res.status(200).json({
       status: true,
       message: "Login successful!",
       data: response,
-      token: token,
+      token, 
     });
-    console.log("checkPassword", checkPassword);
   } catch (error) {
     res.status(500).json({
       status: false,
@@ -132,7 +132,10 @@ export const UpdatePassword = async (req, res) => {
       });
     }
 
-    const isOldPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
+    const isOldPasswordCorrect = await bcrypt.compare(
+      oldPassword,
+      user.password
+    );
 
     if (!isOldPasswordCorrect) {
       return res.status(400).json({

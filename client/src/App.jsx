@@ -12,25 +12,35 @@ import PasswordChange from './pages/auth/PasswordChange'
 import Profile from './pages/client/profile'
 import Logout from './pages/client/logout'
 import LoanRequestPage from './pages/client/Loan'
+import LaonCategory from './pages/Admin/Loan Category'
+import AdminDasboard from './pages/Admin/Dashboard'
+import Users from './pages/Admin/users'
+import { BrowserRouter } from 'react-router-dom'
 
 function App() {
   <Navbar />
 
   return (
     <>
-      <Routes>
-        <Route path='/create-account' element={<SignupPage />} />
-        <Route path='/login' element={<LoginPage />} />
-        <Route index element={<Home />} />
-        <Route path='/about' element={<AboutPage />} />
-        <Route path='/categories' element={<LoanCategories />} />
-        <Route path='/application' element={<ApplyNow />} />
-        <Route path='/update-password' element={<PasswordChange />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/account' element={<PasswordChange />} />
-        <Route path='/logout' element={<Logout />} />
-        <Route path='/loan' element={<LoanRequestPage />} />
-      </Routes>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/create-account' element={<SignupPage />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route index element={<Home />} />
+          <Route path='/about' element={<AboutPage />} />
+          <Route path='/categories' element={<LoanCategories />} />
+          <Route path='/application' element={<ApplyNow />} />
+          <Route path='/update-password' element={<PasswordChange />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/account' element={<PasswordChange />} />
+          <Route path='/logout' element={<Logout />} />
+          <Route path='/loan' element={<LoanRequestPage />} />
+          <Route path='/admin-dashboard' element={<AdminDasboard />} />
+          <Route path='/admin-loans' element={<LaonCategory />} />
+          <Route path='/admin-users' element={<Users />} />
+
+        </Routes>
+      </BrowserRouter>
       <ToastContainer
         position="top-right"
         autoClose={5000}

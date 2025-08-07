@@ -14,7 +14,7 @@ import axios from 'axios';
 import Cookies from "js-cookie"
 
 export default function LoginPage() {
-    const [loading , setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
     const location = useLocation()
     const { control, handleSubmit } = useForm({
@@ -33,23 +33,24 @@ export default function LoginPage() {
             const response = await axios.post(api, data)
             console.log("response", response)
             setLoading(false)
-            Cookies.set("token" , response.data.token)
-            const path = location.state.path
+            Cookies.set("token", response.data.token)
+            const path = location?.state?.path
             toastAlert({
                 type: "success",
                 message: "log in Successful"
             })
-            if(path === "signupModal"){
-                navigate("/update-password" ,{
-                    state : {
-                        email : data.email
+            if (path) {
+                navigate("/update-password", {
+                    state: {
+                        email: data.email
                     }
                 })
-            }else{
+            } else {
                 navigate("/")
             }
         } catch (error) {
             setLoading(false)
+            console.log("error",error.message)
             toastAlert({
                 type: "error",
                 message: error.message
@@ -78,7 +79,7 @@ export default function LoginPage() {
                     boxShadow: 3
                 }}
             >
-                <Typography variant="h5" color="#1B5E20" fontWeight={700} mb={3}>
+                <Typography variant="h5" color="#1B5E20" fontWeight={700} mb={3} textAlign={"center"}>
                     Login to Your Account
                 </Typography>
 
@@ -105,7 +106,7 @@ export default function LoginPage() {
                         </Typography>
                     </Box>
                     <Button type="submit" variant="contained" sx={{ backgroundColor: '#2E7D32' }}
-                        disabled = {loading}
+                        disabled={loading}
                     >
                         {loading ? "Logging in..." : "Login"}
                     </Button>

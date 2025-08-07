@@ -7,9 +7,23 @@ import CardActionArea from '@mui/material/CardActionArea';
 import { Box, Button } from '@mui/material';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import HomeWorkIcon from '@mui/icons-material/HomeWork';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import SchoolIcon from '@mui/icons-material/School';
+import { useDispatch } from 'react-redux';
+import { addLoan } from '../../redux/slices/loan';
+
+const categoryIconMap = {
+  "Wedding": <FavoriteIcon sx={{ fontSize: 40, color: '#2E7D32' }} />,
+  "Business": <BusinessCenterIcon sx={{ fontSize: 40, color: '#2E7D32' }} />,
+  "Home Construction": <HomeWorkIcon sx={{ fontSize: 40, color: '#2E7D32' }} />,
+  "Education": <SchoolIcon sx={{ fontSize: 40, color: '#2E7D32' }} />
+};
 
 export default function LoanCard({ loan, handleOpen }) {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const handleApply = () => {
     navigate("/application")
   }
@@ -28,27 +42,29 @@ export default function LoanCard({ loan, handleOpen }) {
     >
       <CardContent>
         <Box display="flex" alignItems="center" gap={1} mb={2}>
-          {loan?.icon}
+          {categoryIconMap[loan.category] || <FavoriteIcon />}
+
           <Typography variant="h6" fontWeight={600} color="#1B5E20">
             {loan?.title}
           </Typography>
         </Box>
-
         <Typography variant="body2" color="#357A38" fontWeight={500}>
-          Subcategories:
+          Category : {loan.category}
         </Typography>
-        <ul style={{ marginTop: 4, paddingLeft: 20 }}>
-          {loan?.sub?.map((category, index) => {
-            return <li key={index} style={{ color: '#4CAF50', fontSize: '0.875rem' }}>
-              {category}
-            </li>
-          })}
-        </ul>
+        <Typography variant="body2" color="#357A38" fontWeight={500}>
+          Subcategory : {loan.subCategory}
+        </Typography>
+
 
         <Typography variant="body2" mt={1} color="#2E7D32">
-          Max Loan: <strong>{loan?.max}</strong>
+          Max Loan: <strong>{loan?.maxAmount}</strong>
         </Typography>
+        <Typography variant="body2" mt={1} color="#2E7D32">
+          Tenure: <strong>{loan?.tenure}</strong> monnths
+        </Typography>
+
       </CardContent>
+
 
       <Button
         variant="contained"
@@ -62,7 +78,10 @@ export default function LoanCard({ loan, handleOpen }) {
         }}
         onClick={() => {
           const token = Cookies.get("token");
-          return !token ?  handleOpen() :handleApply();
+          console.log("Loan about to dispatch:", loan)
+          dispatch(addLoan(loan));
+
+          return !token ? handleOpen() : handleApply();
         }}
       >
         Apply Now

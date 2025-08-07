@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import axios from 'axios';
 import { BASE_URL, toastAlert } from '../utils';
 import { apiEndPoints } from '../constant/apiEndPoints';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 const steps = ['Personal Information', 'Guarantors', 'Loan Details'];
 
@@ -22,11 +23,15 @@ export default function LoanApplicationStepper() {
   const [completed, setCompleted] = useState({});
   const [loading, setLoading] = useState()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const loan = useSelector((state) => state.loan.loan);
+  console.log("loan", loan)
   const {
     control,
     handleSubmit,
     trigger,
     getValues,
+    reset,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -41,7 +46,8 @@ export default function LoanApplicationStepper() {
       laonAmout: '',
       category: '',
       subCategory: '',
-      address: ''
+      address: '',
+      tenure: ''
     }
   });
 
@@ -95,8 +101,24 @@ export default function LoanApplicationStepper() {
         message: error.message
       })
     }
-    alert('Loan application submitted successfully!');
   };
+
+  useEffect(() => {
+    if (loan) {
+      reset({
+        category: loan.category || '',
+        subCategory: loan.subCategory || '',
+        laonAmout: loan.maxAmount || '',
+        tenure: loan.tenure || '',
+        guarantors: [
+          { name: '', email: '', location: '', cnic: '' },
+          { name: '', email: '', location: '', cnic: '' }
+        ]
+      });
+    }
+  }, [loan]);
+
+
 
   const renderStepContent = (step) => {
     switch (step) {
@@ -106,40 +128,36 @@ export default function LoanApplicationStepper() {
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Full name is required' }}
               render={({ field }) => (
-                <TextField {...field} label="Full Name" error={!!errors.name} helperText={errors.name?.message} />
+                <TextField {...field} label="Full Name" />
               )}
             />
             <Controller
               name="email"
               control={control}
-              rules={{ required: 'Email is required' }}
               render={({ field }) => (
-                <TextField {...field} label="Email" error={!!errors.email} helperText={errors.email?.message} />
+                <TextField {...field} label="Email" />
               )}
             />
             <Controller
               name="cnic"
               control={control}
-              rules={{ required: 'Email is required' }}
               render={({ field }) => (
-                <TextField {...field} label="CNIC" error={!!errors.email} helperText={errors.email?.message} />
+                <TextField {...field} label="CNIC" />
               )}
             />
             <Controller
               name="contactNumber"
               control={control}
-              rules={{ required: 'Phone number is required' }}
               render={({ field }) => (
-                <TextField {...field} label="Phone Number" error={!!errors.phone} helperText={errors.phone?.message} />
+                <TextField {...field} label="Phone Number" />
               )}
             />
             <Controller
               name="address"
               control={control}
               render={({ field }) => (
-                <TextField {...field} label="Address" multiline error={!!errors.phone} helperText={errors.phone?.message} />
+                <TextField {...field} label="Address" multiline />
               )}
             />
           </Stack>
@@ -155,33 +173,29 @@ export default function LoanApplicationStepper() {
                 <Controller
                   name={`guarantors.${idx}.name`}
                   control={control}
-                  rules={{ required: 'Name is required' }}
                   render={({ field }) => (
-                    <TextField {...field} label="Name" error={!!errors.guarantors?.[idx]?.name} helperText={errors.guarantors?.[idx]?.name?.message} />
+                    <TextField {...field} label="Name" />
                   )}
                 />
                 <Controller
                   name={`guarantors.${idx}.email`}
                   control={control}
-                  rules={{ required: 'Email is required' }}
                   render={({ field }) => (
-                    <TextField {...field} label="Email" error={!!errors.guarantors?.[idx]?.email} helperText={errors.guarantors?.[idx]?.email?.message} />
+                    <TextField {...field} label="Email" />
                   )}
                 />
                 <Controller
                   name={`guarantors.${idx}.location`}
                   control={control}
-                  rules={{ required: 'Location is required' }}
                   render={({ field }) => (
-                    <TextField {...field} label="Location" error={!!errors.guarantors?.[idx]?.location} helperText={errors.guarantors?.[idx]?.location?.message} />
+                    <TextField {...field} label="Location" />
                   )}
                 />
                 <Controller
                   name={`guarantors.${idx}.cnic`}
                   control={control}
-                  rules={{ required: 'CNIC is required' }}
                   render={({ field }) => (
-                    <TextField {...field} label="CNIC" error={!!errors.guarantors?.[idx]?.cnic} helperText={errors.guarantors?.[idx]?.cnic?.message} />
+                    <TextField {...field} label="CNIC" />
                   )}
                 />
               </Stack>
@@ -195,25 +209,30 @@ export default function LoanApplicationStepper() {
             <Controller
               name="category"
               control={control}
-              rules={{ required: 'Category is required' }}
               render={({ field }) => (
-                <TextField {...field} label="Category" error={!!errors.category} helperText={errors.category?.message} />
+                <TextField  {...field} label="Category" />
               )}
             />
             <Controller
               name="subCategory"
               control={control}
-              rules={{ required: 'Subcategory is required' }}
               render={({ field }) => (
-                <TextField {...field} label="Subcategory" error={!!errors.subcategory} helperText={errors.subcategory?.message} />
+                <TextField {...field} label="Subcategory" />
               )}
             />
             <Controller
               name="laonAmout"
               control={control}
-              rules={{ required: 'Loan amount is required' }}
+
               render={({ field }) => (
-                <TextField {...field} label="Loan Amount" error={!!errors.loanAmount} helperText={errors.loanAmount?.message} />
+                <TextField {...field} label="Loan Amount" />
+              )}
+            />
+            <Controller
+              name="tenure"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} label="tenure (months)" />
               )}
             />
             <Button
