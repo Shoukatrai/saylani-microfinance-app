@@ -20,12 +20,12 @@ const pages = [{
   url: "/about"
 },
 {
-  title: 'Loan Categories',
-  url: "/categories"
+  title: 'Apply Now',
+  url: "/apply-now"
 },
 {
-  title: 'Apply Now',
-  url: "/application"
+  title: 'Loan Applications',
+  url: "/loan-applications"
 },
 ];
 const settings = [
@@ -36,10 +36,6 @@ const settings = [
   {
     title: 'Account',
     url: '/account'
-  },
-  {
-    title: 'Loan Request',
-    url: '/loan'
   },
   {
     title: 'Logout',

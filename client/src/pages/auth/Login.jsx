@@ -34,6 +34,7 @@ export default function LoginPage() {
             console.log("response", response)
             setLoading(false)
             Cookies.set("token", response.data.token)
+            Cookies.set("type", response.data.data.userType)
             const path = location?.state?.path
             toastAlert({
                 type: "success",
@@ -45,8 +46,12 @@ export default function LoginPage() {
                         email: data.email
                     }
                 })
-            } else {
+            }
+            if(response.data.data.userType === "user"){
                 navigate("/")
+                
+            }else{
+                navigate("/admin-dashboard")
             }
         } catch (error) {
             setLoading(false)

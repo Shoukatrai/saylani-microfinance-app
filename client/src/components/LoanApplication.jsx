@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const steps = ['Personal Information', 'Guarantors', 'Loan Details'];
 
-export default function LoanApplicationStepper() {
+export default function LoanFlow() {
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState({});
   const [loading, setLoading] = useState()

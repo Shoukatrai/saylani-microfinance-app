@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const applicationSchema = new mongoose.Schema(
   {
+    createBy:{
+      type : String,
+      required : true
+    },
     name: {
       type: String,
       required: true,

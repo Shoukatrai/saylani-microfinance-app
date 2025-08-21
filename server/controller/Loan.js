@@ -3,9 +3,14 @@ import Loan from "../model/Loan.js";
 
 export const applyForLoan = async (req, res) => {
   try {
-    
+    const userId = req.user.id
+    console.log("userId" , userId)
+    const obj = {
+      ...req.body,
+      createBy: userId
+    }
     const body = req.body;
-    const response = await Application.create(body);
+    const response = await Application.create(obj);
     console.log(response, "response");
     res.status(200).json({
       message: "Applied Successfully!",
