@@ -19,6 +19,7 @@ import AuthRoutes from "./routes/AuthRoutes";
 import ClientRoutes from "./routes/ClientRoutes";
 import UserLoanApplications from "./pages/client/UserLoanApplications";
 import AdminRoutes from "./routes/AdminRoutes";
+import Slip from "./pages/client/Loan/Slip";
 
 function App() {
   <Navbar />;
@@ -41,6 +42,7 @@ function App() {
             <Route path="/loan-apply-now" element={<LoanApplication />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/apply-now" element={<LoanCategories />} />
+            <Route path="/application-slip" element={<Slip />} />
             <Route
               path="/loan-applications"
               element={<UserLoanApplications />}

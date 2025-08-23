@@ -6,12 +6,13 @@ import { BASE_URL, toastAlert } from "../utils";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const LoanApplication = () => {
   const location = useLocation();
-  const loan = location.state?.loan; // Loan passed from route
-  const loanCart = useSelector((state) => state.loan); // Loan from Redux
+  const loan = location.state?.loan; 
+  const loanCart = useSelector((state) => state.loan);
+  const navigate = useNavigate() 
   console.log("Loan from Redux:", loanCart);
   const [loading, setLoading] = React.useState(false);
 
@@ -23,10 +24,10 @@ const LoanApplication = () => {
       cnic: "",
       category: "",
       subCategory: "",
-      loanAmount: "",
-      guarantorName: "",
-      guarantorCnic: "",
-      guarantorContactNumber: "",
+      laonAmount: "",
+      gurantorName: "",
+      gurantorCnic: "",
+      gurantorContactNumber: "",
       loanId: "",
     },
   });
@@ -52,7 +53,10 @@ const LoanApplication = () => {
       reset();
       toastAlert({
         type: "success",
-        message: "Loan application submitted successfully!",
+        message: "Loan application submitted!",
+      });
+      navigate("/application-slip" , {
+        state: { application:response.data.data , qrCodeUrl : response.data.qrCodeUrl}
       });
     } catch (error) {
       toastAlert({
@@ -107,7 +111,7 @@ const LoanApplication = () => {
         Loan Application Form
       </Typography>
 
-      {/* --- Personal Info --- */}
+      
       <Controller
         name="name"
         control={control}
@@ -148,7 +152,7 @@ const LoanApplication = () => {
         )}
       />
 
-      {/* --- Loan Info --- */}
+     
       <Controller
         name="category"
         control={control}
@@ -168,7 +172,7 @@ const LoanApplication = () => {
       />
 
       <Controller
-        name="loanAmount"
+        name="laonAmount"
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
@@ -176,9 +180,9 @@ const LoanApplication = () => {
         )}
       />
 
-      {/* --- Guarantor Info --- */}
+      
       <Controller
-        name="guarantorName"
+        name="gurantorName"
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
@@ -187,7 +191,7 @@ const LoanApplication = () => {
       />
 
       <Controller
-        name="guarantorCnic"
+        name="gurantorCnic"
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
@@ -196,7 +200,7 @@ const LoanApplication = () => {
       />
 
       <Controller
-        name="guarantorContactNumber"
+        name="gurantorContactNumber"
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
