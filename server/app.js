@@ -22,6 +22,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/loan", loanRouter);
 app.use("/api/admin", adminRouter);
 
+app.get("/", (req, res) => {
+  res.send("API is running....");
+});
 try {
   await dbConnection();
   console.log("DB connected");
