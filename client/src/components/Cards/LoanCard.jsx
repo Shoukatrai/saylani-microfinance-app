@@ -25,7 +25,11 @@ export default function LoanCard({ loan, handleOpen }) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const handleApply = () => {
-    navigate("/application")
+    navigate("/loan-apply-now" , {
+      state: {
+        loan: loan
+      }
+    })
   }
   return (
     <Card
@@ -37,7 +41,10 @@ export default function LoanCard({ loan, handleOpen }) {
         flexDirection: 'column',
         justifyContent: 'space-between',
         p: 2,
-        boxShadow: "rgba(17, 12, 46, 0.15) 0px 48px 100px 0px"
+        boxShadow: "rgba(17, 12, 46, 0.15) 0px 48px 100px 0px",
+        maxWidth: 300,
+        minWidth: 250,
+        transition: 'transform 0.3s, box-shadow 0.3s',
       }}
     >
       <CardContent>

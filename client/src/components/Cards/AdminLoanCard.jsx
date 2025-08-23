@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { BASE_URL, toastAlert } from '../../utils';
 import { apiEndPoints } from '../../constant/apiEndPoints';
+import Cookies from 'js-cookie';
+
 
 export default function AdminLoanCard({ loan , setRefresh}) {
   const navigate = useNavigate();
@@ -26,7 +28,11 @@ export default function AdminLoanCard({ loan , setRefresh}) {
       const obj = {
         isActive: !isActive
       }
-      const response = await axios.patch(api, obj)
+      const response = await axios.patch(api, obj , {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`
+        }
+      })
       console.log("response", response)
       setLoading(false)
       toastAlert({

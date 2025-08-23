@@ -50,19 +50,19 @@ export const createUser = async (req, res) => {
         html: userPassUpdateTemplate(rawPassword),
       };
 
-      const loanObj = {
-        ...rest,
-        email,
-        applicantId: createdUser._id,
-      };
-      const LoanRequestResponse = await LoanRequest.create(loanObj);
-      console.log("LoanRequestResponse", LoanRequestResponse);
+      // const loanObj = {
+        // ...rest,
+        // email,
+        // applicantId: createdUser._id,
+      // };
+      // const LoanRequestResponse = await LoanRequest.create(loanObj);
+      // console.log("LoanRequestResponse", LoanRequestResponse);
       const emailResponse = await transporter.sendMail(mailOptions);
     }
 
     res.status(200).json({
       status: true,
-      message: "SignUp Completed!",
+      message: !password ? "password update" : "SignUp Completed!",
       data: createdUser,
     });
   } catch (error) {

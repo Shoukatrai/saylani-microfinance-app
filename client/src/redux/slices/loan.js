@@ -10,7 +10,7 @@ export const loanSlice = createSlice({
   reducers: {
     addLoan: (state, action) => {
       console.log("Reducer fired with:", action.payload);
-      state.loan = action.payload; // ✅ Should work
+      state.loan = action.payload; 
     },
     deleteLoan: (state) => {
       state.loan = null;

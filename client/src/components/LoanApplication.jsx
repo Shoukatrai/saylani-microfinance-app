@@ -1,305 +1,224 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Typography,
-  Stepper,
-  Step,
-  StepButton,
-  TextField,
-  Stack
-} from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import axios from 'axios';
-import { BASE_URL, toastAlert } from '../utils';
-import { apiEndPoints } from '../constant/apiEndPoints';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
+import { apiEndPoints } from "../constant/apiEndPoints";
+import { BASE_URL, toastAlert } from "../utils";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
-const steps = ['Personal Information', 'Guarantors', 'Loan Details'];
+const LoanApplication = () => {
+  const location = useLocation();
+  const loan = location.state?.loan; // Loan passed from route
+  const loanCart = useSelector((state) => state.loan); // Loan from Redux
+  console.log("Loan from Redux:", loanCart);
+  const [loading, setLoading] = React.useState(false);
 
-export default function LoanFlow() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [completed, setCompleted] = useState({});
-  const [loading, setLoading] = useState()
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const loan = useSelector((state) => state.loan.loan);
-  console.log("loan", loan)
-  const {
-    control,
-    handleSubmit,
-    trigger,
-    getValues,
-    reset,
-    formState: { errors }
-  } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      name: '',
-      email: '',
-      contactNumber: '',
-      cnic: '',
-      guarantors: [
-        { name: '', email: '', location: '', cnic: '' },
-        { name: '', email: '', location: '', cnic: '' }
-      ],
-      laonAmout: '',
-      category: '',
-      subCategory: '',
-      address: '',
-      tenure: ''
-    }
+      name: "",
+      contactNumber: "",
+      address: "",
+      cnic: "",
+      category: "",
+      subCategory: "",
+      loanAmount: "",
+      guarantorName: "",
+      guarantorCnic: "",
+      guarantorContactNumber: "",
+      loanId: "",
+    },
   });
 
-  const totalSteps = () => steps.length;
-  const completedSteps = () => Object.keys(completed).length;
-  const isLastStep = () => activeStep === totalSteps() - 1;
-  const allStepsCompleted = () => completedSteps() === totalSteps();
-
-  const handleNext = async () => {
-    const valid = await trigger();
-    if (!valid) return;
-
-    const newStep =
-      isLastStep() && !allStepsCompleted()
-        ? steps.findIndex((_, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newStep);
-  };
-
-  const handleBack = () => setActiveStep((prev) => prev - 1);
-  const handleStep = (step) => () => setActiveStep(step);
-  const handleComplete = async () => {
-    const valid = await trigger();
-    if (!valid) return;
-    setCompleted({ ...completed, [activeStep]: true });
-    handleNext();
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
-
   const onSubmit = async (data) => {
-    console.log('Form submitted:', data);
     try {
-      setLoading(true)
-      const api = `${BASE_URL}${apiEndPoints.loanApply}`
-      const response = await axios.post(api, data)
-      console.log("response", response)
-      setLoading(false)
+      setLoading(true);
+
+      if (loan?._id) {
+        data.loanId = loan._id;
+      } else if (loanCart?.loanId) {
+        data.loanId = loanCart.loanId;
+      }
+
+      const api = `${BASE_URL}${apiEndPoints.loanApply}`;
+      const response = await axios.post(api, data, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`,
+        },
+      });
+
+      console.log("Response:", response);
+      reset();
       toastAlert({
         type: "success",
-        message: response.data.message
-      })
+        message: "Loan application submitted successfully!",
+      });
     } catch (error) {
-      console.log(error)
-      setLoading(false)
       toastAlert({
         type: "error",
-        message: error.message
-      })
+        message: error.response?.data?.message || error.message,
+      });
+      console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (loan) {
+    if (loanCart?.loan?.category || loanCart?.loan?.subCategory) {
       reset({
-        category: loan.category || '',
-        subCategory: loan.subCategory || '',
-        laonAmout: loan.maxAmount || '',
-        tenure: loan.tenure || '',
-        guarantors: [
-          { name: '', email: '', location: '', cnic: '' },
-          { name: '', email: '', location: '', cnic: '' }
-        ]
+        category: loanCart.loan.category,
+        subCategory: loanCart.loan.subCategory,
+      });
+    } else if (loan) {
+      reset({
+        category: loan.category,
+        subCategory: loan.subCategory,
       });
     }
-  }, [loan]);
-
-
-
-  const renderStepContent = (step) => {
-    switch (step) {
-      case 0:
-        return (
-          <Stack spacing={2}>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="Full Name" />
-              )}
-            />
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="Email" />
-              )}
-            />
-            <Controller
-              name="cnic"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="CNIC" />
-              )}
-            />
-            <Controller
-              name="contactNumber"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="Phone Number" />
-              )}
-            />
-            <Controller
-              name="address"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="Address" multiline />
-              )}
-            />
-          </Stack>
-        );
-
-      case 1:
-        const guarantors = getValues('guarantors');
-        return (
-          <Stack spacing={3}>
-            {guarantors.map((_, idx) => (
-              <Stack key={idx} spacing={2}>
-                <Typography fontWeight={600}>Guarantor {idx + 1}</Typography>
-                <Controller
-                  name={`guarantors.${idx}.name`}
-                  control={control}
-                  render={({ field }) => (
-                    <TextField {...field} label="Name" />
-                  )}
-                />
-                <Controller
-                  name={`guarantors.${idx}.email`}
-                  control={control}
-                  render={({ field }) => (
-                    <TextField {...field} label="Email" />
-                  )}
-                />
-                <Controller
-                  name={`guarantors.${idx}.location`}
-                  control={control}
-                  render={({ field }) => (
-                    <TextField {...field} label="Location" />
-                  )}
-                />
-                <Controller
-                  name={`guarantors.${idx}.cnic`}
-                  control={control}
-                  render={({ field }) => (
-                    <TextField {...field} label="CNIC" />
-                  )}
-                />
-              </Stack>
-            ))}
-          </Stack>
-        );
-
-      case 2:
-        return (
-          <Stack spacing={2}>
-            <Controller
-              name="category"
-              control={control}
-              render={({ field }) => (
-                <TextField  {...field} label="Category" />
-              )}
-            />
-            <Controller
-              name="subCategory"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="Subcategory" />
-              )}
-            />
-            <Controller
-              name="laonAmout"
-              control={control}
-
-              render={({ field }) => (
-                <TextField {...field} label="Loan Amount" />
-              )}
-            />
-            <Controller
-              name="tenure"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="tenure (months)" />
-              )}
-            />
-            <Button
-              variant="contained"
-              type="submit"
-              sx={{ mt: 2, backgroundColor: '#2E7D32', '&:hover': { backgroundColor: '#1B5E20' } }}
-              disabled={loading}
-            >
-              {loading ? "Applying" : "Apply Now"}
-            </Button>
-          </Stack>
-        );
-
-      default:
-        return null;
-    }
-  };
+  }, [loan, loanCart, reset]);
 
   return (
-    <Box sx={{
-      width: '100%', maxWidth: 600, mx: 'auto', p: {
-        xs: 2,
-        md: 3,
-        lg: 5
-      }, mt: "20px",
-      boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-      borderRadius: "10PX"
-    }}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stepper nonLinear activeStep={activeStep} sx={{ mb: 4 }}>
-          {steps.map((label, index) => (
-            <Step key={label} completed={completed[index]}>
-              <StepButton color="green" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+    <Box
+      component={"form"}
+      sx={{
+        width: { xs: "90%", md: "50%" },
+        margin: "auto",
+        padding: 3,
+        marginBlock: 2,
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        justifyContent: "center",
+        backgroundColor: "#F0FDF4",
+        boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+        borderRadius: 2,
+      }}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Typography
+        variant="h5"
+        color="#1B5E20"
+        fontWeight={700}
+        mb={1}
+        textAlign={"center"}
+      >
+        Loan Application Form
+      </Typography>
 
-        <Box>{renderStepContent(activeStep)}</Box>
-
-        <Stack direction="row" justifyContent="space-between" mt={4}>
-          <Button disabled={activeStep === 0} onClick={handleBack}>
-            Back
-          </Button>
-
-          {!isLastStep() && (
-            <Stack direction="row" spacing={2}>
-              <Button onClick={handleComplete} variant="outlined" color="success">
-                Complete Step
-              </Button>
-              <Button onClick={handleNext} variant="contained" sx={{ backgroundColor: '#2E7D32' }}>
-                Next
-              </Button>
-            </Stack>
-          )}
-        </Stack>
-
-        {allStepsCompleted() && (
-          <Box mt={4} textAlign="center">
-            <Typography>All steps completed!</Typography>
-            <Button onClick={handleReset} sx={{ mt: 2 }}>
-              Reset
-            </Button>
-          </Box>
+      {/* --- Personal Info --- */}
+      <Controller
+        name="name"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Full Name" fullWidth {...field} />
         )}
-      </form>
+      />
+
+      <Controller
+        name="cnic"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => <TextField label="CNIC" fullWidth {...field} />}
+      />
+
+      <Controller
+        name="contactNumber"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Phone Number" fullWidth {...field} />
+        )}
+      />
+
+      <Controller
+        name="address"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField
+            label="Address"
+            multiline
+            minRows={2}
+            fullWidth
+            {...field}
+          />
+        )}
+      />
+
+      {/* --- Loan Info --- */}
+      <Controller
+        name="category"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Loan Category" fullWidth {...field} />
+        )}
+      />
+
+      <Controller
+        name="subCategory"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Sub Category" fullWidth {...field} />
+        )}
+      />
+
+      <Controller
+        name="loanAmount"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Loan Amount" fullWidth {...field} />
+        )}
+      />
+
+      {/* --- Guarantor Info --- */}
+      <Controller
+        name="guarantorName"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Guarantor Name" fullWidth {...field} />
+        )}
+      />
+
+      <Controller
+        name="guarantorCnic"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Guarantor CNIC" fullWidth {...field} />
+        )}
+      />
+
+      <Controller
+        name="guarantorContactNumber"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField label="Guarantor Contact Number" fullWidth {...field} />
+        )}
+      />
+
+      <Button
+        type="submit"
+        sx={{
+          backgroundColor: "#2E7D32",
+          color: "#fff",
+          mt: 2,
+          borderRadius: 2,
+          textTransform: "none",
+        }}
+        disabled={loading}
+      >
+        {loading ? "Submitting..." : "Submit"}
+      </Button>
     </Box>
   );
-}
+};
+
+export default LoanApplication;

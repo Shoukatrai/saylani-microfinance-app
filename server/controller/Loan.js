@@ -3,12 +3,12 @@ import Loan from "../model/Loan.js";
 
 export const applyForLoan = async (req, res) => {
   try {
-    const userId = req.user.id
-    console.log("userId" , userId)
+    const userId = req.user.id;
+    console.log("userId", userId);
     const obj = {
       ...req.body,
-      createBy: userId
-    }
+      createBy: userId,
+    };
     const body = req.body;
     const response = await Application.create(obj);
     console.log(response, "response");
@@ -46,7 +46,7 @@ export const getLoanFilter = async (req, res) => {
 
 export const getAllLoan = async (req, res) => {
   try {
-    const response = await Loan.find({isActive : true});
+    const response = await Loan.find({ isActive: true });
     console.log("response", response);
     res.status(200).json({
       message: "Loan Receioved",
@@ -59,5 +59,15 @@ export const getAllLoan = async (req, res) => {
       status: false,
       data: null,
     });
+  }
+};
+
+export const getAllLoanApplications = async (req, res) => {
+  try {
+    const userId = req.user;
+    console.log("userId", userId);
+    // const response = await Application.find({ createBy: userId });
+  } catch (error) {
+    console.log("error", error);
   }
 };

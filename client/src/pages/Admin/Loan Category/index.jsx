@@ -7,6 +7,8 @@ import { apiEndPoints } from '../../../constant/apiEndPoints'
 import axios from 'axios'
 import { BASE_URL, toastAlert } from '../../../utils'
 import AdminLoanCard from '../../../components/Cards/AdminLoanCard'
+import Cookies from "js-cookie"
+
 
 const LaonCategory = () => {
   const [openModal, setOpenModal] = useState(false)
@@ -20,7 +22,11 @@ const LaonCategory = () => {
   const fetchLoans = async () => {
     try {
       const api = `${BASE_URL}${apiEndPoints.loanGetAll}`;
-      const response = await axios.get(api)
+      const response = await axios.get(api , {
+        headers : {
+          Authorization : `Bearer ${Cookies.get("token")}`
+        }
+      })
       console.log("response", response)
       setMessage(response.data.message)
       if(!response.data.status){
@@ -28,7 +34,7 @@ const LaonCategory = () => {
       }
       setData(response.data.data)
     } catch (error) {
-      console.log(error.message)
+      console.log(error)
       toastAlert({
         type : "error",
         message : message || error.message

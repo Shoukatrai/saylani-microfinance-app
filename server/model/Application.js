@@ -2,9 +2,14 @@ import mongoose from "mongoose";
 
 const applicationSchema = new mongoose.Schema(
   {
-    createBy:{
-      type : String,
-      required : true
+    createBy: {
+      type: String,
+      required: true,
+    },
+    loanId: {
+      type: String,
+      required: true,
+      unique: true,
     },
     name: {
       type: String,
@@ -29,30 +34,21 @@ const applicationSchema = new mongoose.Schema(
       required: true,
       default: null,
     },
-    quaguarantors: [
-      {
-        name: {
-          type: String,
-          required: true,
-          default: null,
-        },
-        email: {
-          type: String,
-          required: true,
-          default: null,
-        },
-        location: {
-          type: String,
-          required: true,
-          default: null,
-        },
-        cnic: {
-          type: String,
-          required: true,
-          default: null,
-        },
-      },
-    ],
+    gurantorName: {
+      type: String,
+      required: true,
+      default: null,
+    },
+    gurantorCnic: {
+      type: String,
+      required: true,
+      default: null,
+    },
+    gurantorContactNumber: {
+      type: String,
+      required: true,
+      default: null,
+    },
     address: {
       type: String,
       required: true,
@@ -60,6 +56,7 @@ const applicationSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      default: "PENDING",
       enum: [
         "PENDING",
         "UNDER_REVIEW",
@@ -71,10 +68,10 @@ const applicationSchema = new mongoose.Schema(
         "CANCELLED",
       ],
     },
-    laonAmout: {
+    laonAmount: {
       type: String,
       required: true,
-      min : 0
+      min: 0,
     },
     interestRate: {
       type: Number,
@@ -102,4 +99,4 @@ const applicationSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Application" , applicationSchema)
+export default mongoose.model("Application", applicationSchema);
