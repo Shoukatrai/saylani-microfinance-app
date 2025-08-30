@@ -132,11 +132,7 @@ const LoanCategory = () => {
         </Stack>
         <Stack direction="row" flexWrap="wrap" justifyContent="center" gap={3}>
           {data.map((loan) => {
-            return (
-              <marquee behavior="" direction="right to left">
-                <LoanCard loan={loan} handleOpen={handleOpen} />
-              </marquee>
-            );
+            return <LoanCard loan={loan} handleOpen={handleOpen} />;
           })}
         </Stack>
         <SignUpModal
