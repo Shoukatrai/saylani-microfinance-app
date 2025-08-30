@@ -5,20 +5,28 @@ export const applyForLoan = async (req, res) => {
   try {
     const userId = req.user.id;
     console.log("userId", userId);
+    if (!req.body.loanId) {
+      return res.status(400).json({
+        message: "loanId is required",
+        status: false,
+      });
+    }
+
     const obj = {
       ...req.body,
       createBy: userId,
     };
+    console.log("obj", obj);
     const body = req.body;
     const response = await Application.create(obj);
-    const loanInfo = response
+    const loanInfo = response;
     let qrCodeUrl = await QRCode.toDataURL(loanInfo);
     console.log(qrCodeUrl, "qrCodeUrl");
     res.status(200).json({
       message: "Applied Successfully!",
       status: true,
       data: response,
-      qrCodeUrl : qrCodeUrl
+      qrCodeUrl: qrCodeUrl,
     });
   } catch (error) {
     res.status(500).json({
@@ -71,7 +79,7 @@ export const getAllLoanApplications = async (req, res) => {
     console.log("userId", userId);
     const response = await Application.find({ createBy: userId });
     console.log("response", response);
-    res.status(200).json({  
+    res.status(200).json({
       message: "All Applications",
       status: true,
       data: response,

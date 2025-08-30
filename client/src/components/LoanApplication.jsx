@@ -10,9 +10,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const LoanApplication = () => {
   const location = useLocation();
-  const loan = location.state?.loan; 
+  const loan = location.state?.loan;
   const loanCart = useSelector((state) => state.loan);
-  const navigate = useNavigate() 
+  const navigate = useNavigate();
   console.log("Loan from Redux:", loanCart);
   const [loading, setLoading] = React.useState(false);
 
@@ -35,12 +35,20 @@ const LoanApplication = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-
-      if (loan?._id) {
-        data.loanId = loan._id;
+      console.log(loanCart.loan._id, "loan Cart")
+      console.log(loan , "loan direct apply Id")
+      if (loanCart.loan._id) {
+        data.loanId = loanCart.loan._id;
       } else if (loanCart?.loanId) {
         data.loanId = loanCart.loanId;
+      } else {
+        toastAlert({ type: "error", message: "Loan ID is missing!" });
+        setLoading(false);
+        return;
       }
+      return
+
+      console.log("data", data);
 
       const api = `${BASE_URL}${apiEndPoints.loanApply}`;
       const response = await axios.post(api, data, {
@@ -55,8 +63,11 @@ const LoanApplication = () => {
         type: "success",
         message: "Loan application submitted!",
       });
-      navigate("/application-slip" , {
-        state: { application:response.data.data , qrCodeUrl : response.data.qrCodeUrl}
+      navigate("/application-slip", {
+        state: {
+          application: response.data.data,
+          qrCodeUrl: response.data.qrCodeUrl,
+        },
       });
     } catch (error) {
       toastAlert({
@@ -111,7 +122,6 @@ const LoanApplication = () => {
         Loan Application Form
       </Typography>
 
-      
       <Controller
         name="name"
         control={control}
@@ -152,7 +162,6 @@ const LoanApplication = () => {
         )}
       />
 
-     
       <Controller
         name="category"
         control={control}
@@ -180,7 +189,6 @@ const LoanApplication = () => {
         )}
       />
 
-      
       <Controller
         name="gurantorName"
         control={control}
